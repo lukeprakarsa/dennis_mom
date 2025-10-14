@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'models/cart.dart';
 import 'screens/catalog_screen.dart';
+import 'screens/cart_screen.dart';
 
 void main() {
-  print('Running my edited main.dart!');
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider<Cart>(   // 👈 add <Cart> here
+      create: (_) => Cart(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,7 +23,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Mock Catalog',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: CatalogScreen(),
+      home: const CatalogScreen(),
+      routes: {
+        '/cart': (context) => const CartScreen(),
+      },
     );
   }
 }
