@@ -5,6 +5,8 @@ import '../data/sample_items.dart';
 import '../models/item.dart';
 import '../models/cart.dart';
 import 'cart_screen.dart';
+import 'item_detail_screen.dart'; 
+import 'vendor_screen.dart';
 
 class CatalogScreen extends StatelessWidget {
   const CatalogScreen({super.key});
@@ -31,7 +33,7 @@ class CatalogScreen extends StatelessWidget {
                       );
                     },
                   ),
-                  if (cart.items.isNotEmpty)
+                  if (cart.totalItemsCount > 0)
                     Positioned(
                       right: 8,
                       top: 8,
@@ -56,6 +58,7 @@ class CatalogScreen extends StatelessWidget {
           ),
         ],
       ),
+
       body: Consumer<Cart>(
         builder: (context, cart, child) {
           return ListView.builder(
@@ -73,6 +76,14 @@ class CatalogScreen extends StatelessWidget {
                     '${item.description}\n\$${item.price.toStringAsFixed(2)}',
                   ),
                   isThreeLine: true,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ItemDetailScreen(item: item),
+                      ),
+                    );
+                  },
                   trailing: quantity == 0
                       ? IconButton(
                           icon: const Icon(Icons.add_shopping_cart),
@@ -106,6 +117,18 @@ class CatalogScreen extends StatelessWidget {
                 ),
               );
             },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.store),
+        tooltip: 'Vendor Screen Demo',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const VendorScreen(),
+            ),
           );
         },
       ),
