@@ -56,13 +56,15 @@ class CartScreen extends StatelessWidget {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Checkout not implemented yet!')),
-            );
-          },
+          onPressed: cart.totalItemsCount == 0
+              ? null // disables the button
+              : () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Checkout not implemented yet!')),
+                  );
+                },
           child: Text(
-            'Checkout - \$${cart.totalPrice.toStringAsFixed(2)}',
+            'Checkout (${cart.totalItemsCount} items) - \$${cart.totalPrice.toStringAsFixed(2)}',
           ),
         ),
       ),

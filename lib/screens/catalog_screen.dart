@@ -42,7 +42,7 @@ class CatalogScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                         child: Text(
-                          '${cart.items.length}',
+                          '${cart.totalItemsCount}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,

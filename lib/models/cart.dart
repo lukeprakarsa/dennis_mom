@@ -37,4 +37,7 @@ class Cart extends ChangeNotifier {
     _items.clear();
     notifyListeners();
   }
+  int get totalItemsCount {
+    return _items.values.fold(0, (sum, qty) => sum + qty);
+  }
 }
