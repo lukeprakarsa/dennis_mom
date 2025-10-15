@@ -2,13 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'models/cart.dart';
+import 'repositories/vendor_repository.dart';   // 👈 import your repository
 import 'screens/catalog_screen.dart';
 import 'screens/cart_screen.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider<Cart>(   // 👈 add <Cart> here
-      create: (_) => Cart(),
+    MultiProvider(
+      providers: [
+        // ----------------------------
+        // Cart provider
+        // ----------------------------
+        ChangeNotifierProvider<Cart>(create: (_) => Cart()),
+
+        // ----------------------------
+        // Vendor repository provider
+        // ----------------------------
+        // Provide the concrete ChangeNotifier implementation.
+        // Note: we register InMemoryVendorRepository directly,
+        // not VendorRepository, because VendorRepository is just an interface.
+        ChangeNotifierProvider<InMemoryVendorRepository>(
+          create: (_) => InMemoryVendorRepository(),
+        ),
+      ],
       child: const MyApp(),
     ),
   );
