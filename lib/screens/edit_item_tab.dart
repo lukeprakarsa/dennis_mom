@@ -25,11 +25,11 @@ class EditItemTab extends StatelessWidget {
               // ----------------------------
               // Leading image with transparent fallback
               // ----------------------------
-                leading: ItemThumbnail(
-                  imageUrl: item.imageUrl,
-                  width: 50,
-                  height: 50,
-                ),
+              leading: ItemThumbnail(
+                imageUrl: item.imageUrl,
+                width: 50,
+                height: 50,
+              ),
               title: Text(item.name),
               subtitle: Text(
                 '${item.description}\n\$${item.price.toStringAsFixed(2)}',
@@ -54,6 +54,8 @@ class EditItemTab extends StatelessWidget {
                           TextEditingController(text: item.description);
                       final imageUrlController =
                           TextEditingController(text: item.imageUrl);
+                      final stockController =
+                          TextEditingController(text: item.stock.toString()); // 👈 new controller
 
                       // 👇 Local state for preview inside the dialog
                       String previewUrl = item.imageUrl;
@@ -98,6 +100,23 @@ class EditItemTab extends StatelessWidget {
                                           }
                                           if (parsed < 0) {
                                             return 'Price cannot be negative';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      TextFormField(
+                                        controller: stockController,
+                                        decoration: const InputDecoration(
+                                            labelText: 'Stock Quantity'),
+                                        keyboardType: TextInputType.number,
+                                        validator: (value) {
+                                          if (value == null ||
+                                              value.isEmpty) {
+                                            return 'Enter stock quantity';
+                                          }
+                                          final parsed = int.tryParse(value);
+                                          if (parsed == null || parsed < 0) {
+                                            return 'Enter a non-negative whole number';
                                           }
                                           return null;
                                         },
@@ -168,7 +187,10 @@ class EditItemTab extends StatelessWidget {
                                             priceController.text),
                                         description:
                                             descriptionController.text,
-                                        imageUrl: imageUrlController.text.trim(),
+                                        imageUrl:
+                                            imageUrlController.text.trim(),
+                                        stock: int.parse(
+                                            stockController.text), // 👈 update stock
                                       );
                                       vendorRepo.editItem(item.id, updated);
                                       Navigator.pop(context);

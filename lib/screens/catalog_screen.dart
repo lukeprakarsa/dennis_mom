@@ -82,62 +82,119 @@ class CatalogScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final Item item = items[index];
               final int quantity = cart.items[item] ?? 0;
+              final bool outOfStock = item.stock == 0;
+              final bool atMaxStock = quantity >= item.stock;
 
-              return Card(
-                margin: const EdgeInsets.all(8),
-                child: ListTile(
-                  leading: ItemThumbnail(
-                    imageUrl: item.imageUrl,
-                    width: 50,
-                    height: 50,
-                  ),
-                  title: Text(item.name),
-                  subtitle: Text(
-                    '${item.description}\n\$${item.price.toStringAsFixed(2)}',
-                  ),
-                  isThreeLine: true,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ItemDetailScreen(item: item),
+              return Stack(
+                children: [
+                  Card(
+                    margin: const EdgeInsets.all(8),
+                    child: ListTile(
+                      leading: ItemThumbnail(
+                        imageUrl: item.imageUrl,
+                        width: 50,
+                        height: 50,
                       ),
-                    );
-                  },
-                  // ----------------------------
-                  // Trailing: add/remove buttons
-                  // ----------------------------
-                  trailing: quantity == 0
-                      ? IconButton(
-                          icon: const Icon(Icons.add_shopping_cart),
-                          onPressed: () {
-                            cart.addItem(item);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${item.name} added to cart!'),
+                      title: Text(item.name),
+                      // ----------------------------
+                      // Subtitle: description + price + stock
+                      // ----------------------------
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.description,
+                            maxLines: 1, // 👈 limit to 1 line
+                            overflow: TextOverflow.ellipsis, // 👈 show "..." if too long
+                          ),
+                          Text(
+                            '\$${item.price.toStringAsFixed(2)}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'Stock: ${item.stock}',
+                            style: TextStyle(
+                              color: item.stock == 0 ? Colors.red : Colors.black,
+                              fontWeight: item.stock <= 3 ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                      isThreeLine: false, // 👈 tighter layout
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ItemDetailScreen(item: item),
+                          ),
+                        );
+                      },
+                      // ----------------------------
+                      // Trailing: add/remove buttons
+                      // ----------------------------
+                      trailing: outOfStock
+                          ? const Text(
+                              'Out of Stock',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
                               ),
-                            );
-                          },
-                        )
-                      : Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove),
-                              onPressed: () {
-                                cart.removeSingleItem(item);
-                              },
+                            )
+                          : quantity == 0
+                              ? IconButton(
+                                  icon: const Icon(Icons.add_shopping_cart),
+                                  onPressed: () {
+                                    cart.addItem(item);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('${item.name} added to cart!'),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.remove),
+                                      onPressed: () {
+                                        cart.removeSingleItem(item);
+                                      },
+                                    ),
+                                    Text('$quantity'),
+                                    IconButton(
+                                      icon: const Icon(Icons.add),
+                                      onPressed: atMaxStock
+                                          ? null // 👈 disable if at max stock
+                                          : () {
+                                              cart.addItem(item);
+                                            },
+                                    ),
+                                  ],
+                                ),
+                    ),
+                  ),
+                  // ----------------------------
+                  // Overlay for out-of-stock items (non-blocking)
+                  // ----------------------------
+                  if (outOfStock)
+                    Positioned.fill(
+                      child: IgnorePointer( // 👈 allow taps to pass through
+                        child: Container(
+                          color: Colors.white.withOpacity(0.7),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'Out of Stock',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
                             ),
-                            Text('$quantity'),
-                            IconButton(
-                              icon: const Icon(Icons.add),
-                              onPressed: () {
-                                cart.addItem(item);
-                              },
-                            ),
-                          ],
+                          ),
                         ),
-                ),
+                      ),
+                    ),
+                ],
               );
             },
           );

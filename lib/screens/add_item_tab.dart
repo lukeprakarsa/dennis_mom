@@ -17,6 +17,7 @@ class _AddItemTabState extends State<AddItemTab> {
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _imageUrlController = TextEditingController();
+  final _stockController = TextEditingController(); // 👈 new controller for stock
 
   String? _previewUrl; // 👈 holds the current preview URL if valid
 
@@ -25,6 +26,7 @@ class _AddItemTabState extends State<AddItemTab> {
     _descriptionController.clear();
     _priceController.clear();
     _imageUrlController.clear();
+    _stockController.clear(); // 👈 reset stock field
     setState(() => _previewUrl = null); // reset preview
   }
 
@@ -100,6 +102,25 @@ class _AddItemTabState extends State<AddItemTab> {
             ),
 
             // ----------------------------
+            // Stock field (with validation)
+            // ----------------------------
+            TextFormField(
+              controller: _stockController,
+              decoration: const InputDecoration(labelText: 'Stock Quantity'),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Enter stock quantity';
+                }
+                final parsed = int.tryParse(value);
+                if (parsed == null || parsed < 0) {
+                  return 'Enter a non-negative whole number';
+                }
+                return null;
+              },
+            ),
+
+            // ----------------------------
             // Image URL field
             // ----------------------------
             TextFormField(
@@ -149,6 +170,7 @@ class _AddItemTabState extends State<AddItemTab> {
                     description: _descriptionController.text,
                     price: double.parse(_priceController.text), // safe now
                     imageUrl: _imageUrlController.text.trim(),
+                    stock: int.parse(_stockController.text), // 👈 new field
                   );
 
                   // Add to repository (this triggers notifyListeners)

@@ -8,6 +8,7 @@ class Item {
   final String description; // Short description of the item
   final double price;       // Price in dollars
   final String imageUrl;    // Path or URL to the product image
+  final int stock;          // Number of units available (0 = out of stock)
 
   // ----------------------------
   // Constructor
@@ -18,6 +19,7 @@ class Item {
     required this.description,
     required this.price,
     required this.imageUrl,
+    required this.stock, // 👈 new required field
   });
 
   // ----------------------------
@@ -31,6 +33,7 @@ class Item {
     String? description,
     double? price,
     String? imageUrl,
+    int? stock, 
   }) {
     return Item(
       id: id ?? this.id,
@@ -38,6 +41,7 @@ class Item {
       description: description ?? this.description,
       price: price ?? this.price,
       imageUrl: imageUrl ?? this.imageUrl,
+      stock: stock ?? this.stock, //  preserve existing stock if not updated
     );
   }
 

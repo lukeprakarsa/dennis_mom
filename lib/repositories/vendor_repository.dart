@@ -20,6 +20,7 @@ class InMemoryVendorRepository extends ChangeNotifier
       description: 'A stylish red t-shirt',
       price: 29.99,
       imageUrl: 'https://i5.walmartimages.com/asr/bea847bb-2b19-4e49-8f11-903a1b9267aa.f430e098b3072789b08fe3b61f09b654.jpeg',
+      stock: 10,    
     ),
     Item(
       id: '2',
@@ -27,6 +28,7 @@ class InMemoryVendorRepository extends ChangeNotifier
       description: 'Comfortable blue jeans',
       price: 59.99,
       imageUrl: 'https://bwolves.com/cdn/shop/files/baggy27_1.jpg?v=1756625352',
+      stock: 5,
     ),
     Item(
       id: '3',
@@ -34,6 +36,7 @@ class InMemoryVendorRepository extends ChangeNotifier
       description: 'Running sneakers',
       price: 89.99,
       imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaFG9gP-JGZrKwwhoPL65u5yO84kC4hb6mbw&s',
+      stock: 0,
     ),
   ];
 

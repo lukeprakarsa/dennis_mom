@@ -13,6 +13,8 @@ class ItemDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final cart = context.watch<Cart>();
     final int quantity = cart.items[item] ?? 0;
+    final bool outOfStock = item.stock == 0;
+    final bool atMaxStock = quantity >= item.stock;
 
     return Scaffold(
       appBar: AppBar(title: Text(item.name)),
@@ -51,38 +53,64 @@ class ItemDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(item.description),
+                  const SizedBox(height: 12),
+
+                  // ----------------------------
+                  // Stock info
+                  // ----------------------------
+                  Text(
+                    'Stock: ${item.stock}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: outOfStock ? Colors.red : Colors.black,
+                      fontWeight: outOfStock ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
                   const SizedBox(height: 24),
 
+                  // ----------------------------
                   // Cart controls
-                  quantity == 0
-                      ? ElevatedButton.icon(
-                          icon: const Icon(Icons.add_shopping_cart),
-                          label: const Text('Add to Cart'),
-                          onPressed: () {
-                            cart.addItem(item);
-                          },
+                  // ----------------------------
+                  outOfStock
+                      ? const Text(
+                          'Out of Stock',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
                         )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove),
-                              onPressed: () {
-                                cart.removeSingleItem(item);
-                              },
-                            ),
-                            Text(
-                              '$quantity',
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.add),
+                      : quantity == 0
+                          ? ElevatedButton.icon(
+                              icon: const Icon(Icons.add_shopping_cart),
+                              label: const Text('Add to Cart'),
                               onPressed: () {
                                 cart.addItem(item);
                               },
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.remove),
+                                  onPressed: () {
+                                    cart.removeSingleItem(item);
+                                  },
+                                ),
+                                Text(
+                                  '$quantity',
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.add),
+                                  onPressed: atMaxStock
+                                      ? null // 👈 disable if at max stock
+                                      : () {
+                                          cart.addItem(item);
+                                        },
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
                 ],
               ),
             ),

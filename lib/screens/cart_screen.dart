@@ -19,12 +19,16 @@ class CartScreen extends StatelessWidget {
               children: cart.items.entries.map((entry) {
                 final Item item = entry.key;
                 final int quantity = entry.value;
+                final bool atMaxStock = quantity >= item.stock;
+
                 return ListTile(
                   key: ValueKey(item.id),
                   leading: Image.network(item.imageUrl),
                   title: Text(item.name),
                   subtitle: Text(
-                    'Quantity: $quantity\n\$${(item.price * quantity).toStringAsFixed(2)}',
+                    'Quantity: $quantity\n'
+                    'Stock: ${item.stock}\n'
+                    '\$${(item.price * quantity).toStringAsFixed(2)}',
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -39,6 +43,16 @@ class CartScreen extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
+                          if (atMaxStock) {
+                            // 👇 Show temporary message if stock exceeded
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('No more stock available'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            return;
+                          }
                           cart.addItem(item);
                         },
                       ),
