@@ -7,24 +7,36 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 
-import 'package:dennis_mom/main.dart';
+import 'package:dennis_mom/models/cart.dart';
+import 'package:dennis_mom/repositories/vendor_repository.dart';
+import 'package:dennis_mom/screens/catalog_screen.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Catalog screen basic test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MultiProvider(
+          providers: [
+            ChangeNotifierProvider<Cart>(create: (_) => Cart()),
+            ChangeNotifierProvider<InMemoryVendorRepository>(
+              create: (_) => InMemoryVendorRepository(),
+            ),
+          ],
+          child: const CatalogScreen(),
+        ),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that the catalog screen is displayed
+    expect(find.text('Catalog'), findsOneWidget);
+    
+    // Verify that the cart icon is present
+    expect(find.byIcon(Icons.shopping_cart), findsOneWidget);
+    
+    // Verify that the vendor button is present
+    expect(find.byIcon(Icons.store), findsOneWidget);
   });
 }

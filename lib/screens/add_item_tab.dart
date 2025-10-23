@@ -165,12 +165,12 @@ class _AddItemTabState extends State<AddItemTab> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   final newItem = Item(
-                    id: DateTime.now().millisecondsSinceEpoch.toString(),
-                    name: _nameController.text,
-                    description: _descriptionController.text,
-                    price: double.parse(_priceController.text), // safe now
-                    imageUrl: _imageUrlController.text.trim(),
-                    stock: int.parse(_stockController.text), // 👈 new field
+                    DateTime.now().millisecondsSinceEpoch.toString(),
+                    _nameController.text,
+                    _descriptionController.text,
+                    double.parse(_priceController.text), // safe now
+                    _imageUrlController.text.trim(),
+                    int.parse(_stockController.text), // 👈 new field
                   );
 
                   // Add to repository (this triggers notifyListeners)

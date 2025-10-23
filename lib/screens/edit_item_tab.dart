@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/item.dart';
 import '../repositories/vendor_repository.dart';
 import '../widgets/item_thumbnail.dart';
 

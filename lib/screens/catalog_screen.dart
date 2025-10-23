@@ -17,6 +17,7 @@ class CatalogScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('📱 Building CatalogScreen...');
     return Scaffold(
       // ----------------------------
       // AppBar with cart icon + badge
@@ -72,10 +73,43 @@ class CatalogScreen extends StatelessWidget {
       // ----------------------------
       body: Consumer2<Cart, InMemoryVendorRepository>(
         builder: (context, cart, repo, child) {
+          print('🛒 Consumer2 builder called - Cart items: ${cart.totalItemsCount}');
           // Upcast to the abstraction
           final VendorRepository vendorRepo = repo;
 
           final items = vendorRepo.getAllItems();
+          print('📦 Repository items: ${items.length}');
+
+          if (items.isEmpty) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'No items in catalog',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Use the vendor button to add items',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
 
           return ListView.builder(
             itemCount: items.length,
@@ -181,7 +215,7 @@ class CatalogScreen extends StatelessWidget {
                     Positioned.fill(
                       child: IgnorePointer( // 👈 allow taps to pass through
                         child: Container(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           alignment: Alignment.center,
                           child: const Text(
                             'Out of Stock',
@@ -205,7 +239,6 @@ class CatalogScreen extends StatelessWidget {
       // Floating Action Button: Vendor screen
       // ----------------------------
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.store),
         tooltip: 'Vendor Screen Demo',
         onPressed: () {
           Navigator.push(
@@ -215,6 +248,7 @@ class CatalogScreen extends StatelessWidget {
             ),
           );
         },
+        child: const Icon(Icons.store),
       ),
     );
   }
