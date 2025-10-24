@@ -155,4 +155,65 @@ router.delete('/:id', [authMiddleware, vendorOnly], async (req, res) => {
   }
 });
 
+// ----------------------------
+// POST /api/checkout
+// Process checkout and update stock
+// ----------------------------
+router.post(
+  '/checkout',
+  [
+    body('items').isArray().withMessage('Items must be an array'),
+    body('items.*.itemId').notEmpty().withMessage('Item ID is required'),
+    body('items.*.quantity').isInt({ min: 1 }).withMessage('Quantity must be a positive integer'),
+  ],
+  async (req, res) => {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const { items } = req.body;
+
+      // Validate stock availability first
+      for (const orderItem of items) {
+        const item = await Item.findById(orderItem.itemId);
+
+        if (!item) {
+          return res.status(404).json({
+            error: `Item ${orderItem.itemId} not found`
+          });
+        }
+
+        if (item.stock < orderItem.quantity) {
+          return res.status(400).json({
+            error: `Insufficient stock for ${item.name}. Available: ${item.stock}, Requested: ${orderItem.quantity}`
+          });
+        }
+      }
+
+      // Update stock for all items
+      for (const orderItem of items) {
+        const item = await Item.findById(orderItem.itemId);
+        const oldStock = item.stock;
+        item.stock -= orderItem.quantity;
+        await item.save();
+
+        console.log(`✅ Updated stock for ${item.name}: ${oldStock} -> ${item.stock}`);
+      }
+
+      res.json({
+        message: 'Checkout successful! Stock has been updated.',
+        success: true,
+      });
+    } catch (error) {
+      console.error('Error during checkout:', error);
+      res.status(500).json({
+        error: error.message || 'Checkout failed'
+      });
+    }
+  }
+);
+
 module.exports = router;

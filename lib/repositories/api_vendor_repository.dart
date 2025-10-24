@@ -129,4 +129,37 @@ class ApiVendorRepository extends ChangeNotifier {
 
   /// Get all items (convenience method)
   List<ApiItem> getAllItems() => items;
+
+  /// Checkout - process cart and update stock
+  Future<void> checkout(Map<ApiItem, int> cartItems) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // Convert cart items to a format the API expects
+      final orderItems = cartItems.entries.map((entry) {
+        return {
+          'itemId': entry.key.id,
+          'quantity': entry.value,
+        };
+      }).toList();
+
+      final response = await ApiService.post(
+        '/api/items/checkout',
+        body: {'items': orderItems},
+      );
+
+      final data = ApiService.handleResponse(response);
+      print('✅ Checkout successful: ${data['message']}');
+
+      // Refresh items to get updated stock
+      await fetchItems();
+    } catch (e) {
+      print('❌ Error during checkout: $e');
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
