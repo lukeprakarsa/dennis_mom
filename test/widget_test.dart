@@ -9,9 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dennis_mom/models/cart.dart';
-import 'package:dennis_mom/repositories/vendor_repository.dart';
-import 'package:dennis_mom/screens/catalog_screen.dart';
+import 'package:dennis_mom/models/api_cart.dart';
+import 'package:dennis_mom/repositories/api_vendor_repository.dart';
+import 'package:dennis_mom/services/auth_service.dart';
+import 'package:dennis_mom/screens/api_catalog_screen.dart';
 
 void main() {
   testWidgets('Catalog screen basic test', (WidgetTester tester) async {
@@ -20,23 +21,27 @@ void main() {
       MaterialApp(
         home: MultiProvider(
           providers: [
-            ChangeNotifierProvider<Cart>(create: (_) => Cart()),
-            ChangeNotifierProvider<InMemoryVendorRepository>(
-              create: (_) => InMemoryVendorRepository(),
+            ChangeNotifierProvider<AuthService>(
+              create: (_) => AuthService(),
+            ),
+            ChangeNotifierProvider<ApiCart>(create: (_) => ApiCart()),
+            ChangeNotifierProxyProvider<AuthService, ApiVendorRepository>(
+              create: (_) => ApiVendorRepository(),
+              update: (context, authService, repository) {
+                repository!.setToken(authService.token);
+                return repository;
+              },
             ),
           ],
-          child: const CatalogScreen(),
+          child: const ApiCatalogScreen(),
         ),
       ),
     );
 
     // Verify that the catalog screen is displayed
     expect(find.text('Catalog'), findsOneWidget);
-    
+
     // Verify that the cart icon is present
     expect(find.byIcon(Icons.shopping_cart), findsOneWidget);
-    
-    // Verify that the vendor button is present
-    expect(find.byIcon(Icons.store), findsOneWidget);
   });
 }

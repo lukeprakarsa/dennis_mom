@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/cart.dart';
-import '../models/item.dart';
+import '../models/api_cart.dart';
+import '../models/api_item.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final cart = context.watch<Cart>();
+    final cart = context.watch<ApiCart>();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Your Cart')),
@@ -17,13 +17,13 @@ class CartScreen extends StatelessWidget {
           ? const Center(child: Text('Your cart is empty'))
           : ListView(
               children: cart.items.entries.map((entry) {
-                final Item item = entry.key;
+                final ApiItem item = entry.key;
                 final int quantity = entry.value;
                 final bool atMaxStock = quantity >= item.stock;
 
                 return ListTile(
                   key: ValueKey(item.id),
-                  leading: Image.network(item.imageUrl),
+                  leading: Image.network(item.imageUrl, width: 50, height: 50),
                   title: Text(item.name),
                   subtitle: Text(
                     'Quantity: $quantity\n'
@@ -44,7 +44,6 @@ class CartScreen extends StatelessWidget {
                         icon: const Icon(Icons.add),
                         onPressed: () {
                           if (atMaxStock) {
-                            // 👇 Show temporary message if stock exceeded
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('No more stock available'),
@@ -71,7 +70,7 @@ class CartScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
           onPressed: cart.totalItemsCount == 0
-              ? null // disables the button
+              ? null
               : () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Checkout not implemented yet!')),

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/item.dart';
-import '../models/cart.dart';
+import '../models/api_item.dart';
+import '../models/api_cart.dart';
 
 class ItemDetailScreen extends StatelessWidget {
-  final Item item;
+  final ApiItem item;
 
   const ItemDetailScreen({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
-    final cart = context.watch<Cart>();
+    final cart = context.watch<ApiCart>();
     final int quantity = cart.items[item] ?? 0;
     final bool outOfStock = item.stock == 0;
     final bool atMaxStock = quantity >= item.stock;

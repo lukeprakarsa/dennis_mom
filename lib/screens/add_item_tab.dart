@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/item.dart';
-import '../repositories/vendor_repository.dart';
+import '../models/api_item.dart';
+import '../repositories/api_vendor_repository.dart';
 
 class AddItemTab extends StatefulWidget {
   const AddItemTab({super.key});
@@ -50,9 +50,7 @@ class _AddItemTabState extends State<AddItemTab> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Read the concrete type, then upcast to the abstraction
-    final repo = Provider.of<InMemoryVendorRepository>(context, listen: false);
-    final VendorRepository vendorRepo = repo;
+    final repo = Provider.of<ApiVendorRepository>(context, listen: false);
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -162,27 +160,37 @@ class _AddItemTabState extends State<AddItemTab> {
             // Submit button
             // ----------------------------
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState!.validate()) {
-                  final newItem = Item(
-                    DateTime.now().millisecondsSinceEpoch.toString(),
-                    _nameController.text,
-                    _descriptionController.text,
-                    double.parse(_priceController.text), // safe now
-                    _imageUrlController.text.trim(),
-                    int.parse(_stockController.text), // 👈 new field
+                  final newItem = ApiItem(
+                    id: '', // Will be assigned by backend
+                    name: _nameController.text,
+                    description: _descriptionController.text,
+                    price: double.parse(_priceController.text),
+                    imageUrl: _imageUrlController.text.trim(),
+                    stock: int.parse(_stockController.text),
                   );
 
-                  // Add to repository (this triggers notifyListeners)
-                  vendorRepo.addItem(newItem);
+                  try {
+                    // Add to repository via API
+                    await repo.addItem(newItem);
 
-                  // Show confirmation
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${newItem.name} added!')),
-                  );
+                    if (context.mounted) {
+                      // Show confirmation
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('${newItem.name} added!')),
+                      );
 
-                  // Reset form fields
-                  _clearForm();
+                      // Reset form fields
+                      _clearForm();
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error adding item: $e')),
+                      );
+                    }
+                  }
                 }
               },
               child: const Text('Add Item'),

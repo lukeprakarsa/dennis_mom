@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/item.dart';
-import '../repositories/vendor_repository.dart';
+import '../models/api_item.dart';
+import '../repositories/api_vendor_repository.dart';
 import '../widgets/item_thumbnail.dart';
 
 class EditItemTab extends StatelessWidget {
@@ -10,13 +10,9 @@ class EditItemTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 👇 Wrap in Consumer so it rebuilds when vendorRepo changes
-    return Consumer<InMemoryVendorRepository>(
+    return Consumer<ApiVendorRepository>(
       builder: (context, repo, child) {
-        // Upcast to the abstraction
-        final VendorRepository vendorRepo = repo;
-
-        final items = vendorRepo.getAllItems();
+        final items = repo.getAllItems();
 
         return ListView.builder(
           itemCount: items.length,
@@ -180,7 +176,7 @@ class EditItemTab extends StatelessWidget {
                                   child: const Text('Cancel'),
                                 ),
                                 TextButton(
-                                  onPressed: () {
+                                  onPressed: () async {
                                     if (formKey.currentState!.validate()) {
                                       final updated = item.copyWith(
                                         name: nameController.text,
@@ -191,10 +187,21 @@ class EditItemTab extends StatelessWidget {
                                         imageUrl:
                                             imageUrlController.text.trim(),
                                         stock: int.parse(
-                                            stockController.text), // 👈 update stock
+                                            stockController.text),
                                       );
-                                      vendorRepo.editItem(item.id, updated);
-                                      Navigator.pop(context);
+
+                                      try {
+                                        await repo.editItem(item.id, updated);
+                                        if (context.mounted) {
+                                          Navigator.pop(context);
+                                        }
+                                      } catch (e) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Error: $e')),
+                                          );
+                                        }
+                                      }
                                     }
                                   },
                                   child: const Text('Save'),
@@ -225,14 +232,25 @@ class EditItemTab extends StatelessWidget {
                               child: const Text('Cancel'),
                             ),
                             TextButton(
-                              onPressed: () {
-                                vendorRepo.deleteItem(item.id);
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('${item.name} deleted'),
-                                  ),
-                                );
+                              onPressed: () async {
+                                try {
+                                  await repo.deleteItem(item.id);
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('${item.name} deleted'),
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Error: $e')),
+                                    );
+                                  }
+                                }
                               },
                               child: const Text(
                                 'Delete',

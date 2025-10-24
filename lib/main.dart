@@ -1,67 +1,77 @@
-import 'package:dennis_mom/models/item.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:realm/realm.dart';
 
-import 'models/cart.dart';
-import 'repositories/vendor_repository.dart'; // 👈 import your repository
-import 'screens/catalog_screen.dart';
+import 'models/api_cart.dart';
+import 'repositories/api_vendor_repository.dart';
+import 'services/auth_service.dart';
+import 'screens/api_catalog_screen.dart';
 import 'screens/cart_screen.dart';
+import 'screens/login_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   print('🚀 App starting...');
-  
-  RealmResults<Item>? allItems;
-  
-  if (kIsWeb) {
-    print('🌐 Running on web - Realm not supported, using in-memory data only');
-    allItems = null; // Will use repository data instead
-  } else {
-    print('🖥️ Running on desktop - initializing Realm');
-    final realm = Realm(Configuration.local([Item.schema]));
-    print('✅ Realm initialized');
-    allItems = realm.all<Item>();
-    print('📦 Items loaded: ${allItems.length}');
-  }
 
   runApp(
     MultiProvider(
       providers: [
         // ----------------------------
-        // Cart provider
+        // Authentication service
         // ----------------------------
-        ChangeNotifierProvider<Cart>(create: (_) => Cart()),
+        ChangeNotifierProvider<AuthService>(
+          create: (_) => AuthService()..initialize(),
+        ),
 
         // ----------------------------
-        // Vendor repository provider
+        // Cart provider
         // ----------------------------
-        // Provide the concrete ChangeNotifier implementation.
-        // Note: we register InMemoryVendorRepository directly,
-        // not VendorRepository, because VendorRepository is just an interface.
-        ChangeNotifierProvider<InMemoryVendorRepository>(
-          create: (_) => InMemoryVendorRepository(),
+        ChangeNotifierProvider<ApiCart>(create: (_) => ApiCart()),
+
+        // ----------------------------
+        // Vendor repository provider (API-backed)
+        // ----------------------------
+        ChangeNotifierProxyProvider<AuthService, ApiVendorRepository>(
+          create: (_) => ApiVendorRepository(),
+          update: (context, authService, repository) {
+            repository!.setToken(authService.token);
+            return repository;
+          },
         ),
       ],
-      child: MyApp(items: allItems),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, this.items});
-
-  final RealmResults<Item>? items;
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     print('🏗️ Building MyApp...');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Mock Catalog',
+      title: 'Dennis Mom Catalog',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const CatalogScreen(),
-      routes: {'/cart': (context) => const CartScreen()},
+      home: Consumer<AuthService>(
+        builder: (context, authService, child) {
+          // Show loading screen while checking authentication
+          if (authService.isLoading) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          // Show catalog screen (guests can browse, login button shown)
+          return const ApiCatalogScreen();
+        },
+      ),
+      routes: {
+        '/cart': (context) => const CartScreen(),
+        '/login': (context) => const LoginScreen(),
+      },
     );
   }
 }
