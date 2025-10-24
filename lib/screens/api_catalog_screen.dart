@@ -109,9 +109,14 @@ class _ApiCatalogScreenState extends State<ApiCatalogScreen> {
             },
           ),
 
-          // Cart button
-          Consumer<ApiCart>(
-            builder: (context, cart, child) {
+          // Cart button (hidden for vendors)
+          Consumer2<AuthService, ApiCart>(
+            builder: (context, authService, cart, child) {
+              // Hide cart for vendors
+              if (authService.isAuthenticated && authService.currentUser?.isVendor == true) {
+                return const SizedBox.shrink();
+              }
+
               return Stack(
                 alignment: Alignment.center,
                 children: [
@@ -156,9 +161,9 @@ class _ApiCatalogScreenState extends State<ApiCatalogScreen> {
       // ----------------------------
       // Body: list of items
       // ----------------------------
-      body: Consumer2<ApiCart, ApiVendorRepository>(
-        builder: (context, cart, repo, child) {
-          print('🛒 Consumer2 builder called - Cart items: ${cart.totalItemsCount}');
+      body: Consumer3<AuthService, ApiCart, ApiVendorRepository>(
+        builder: (context, authService, cart, repo, child) {
+          print('🛒 Consumer3 builder called - Cart items: ${cart.totalItemsCount}');
 
           if (repo.isLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -251,49 +256,51 @@ class _ApiCatalogScreenState extends State<ApiCatalogScreen> {
                         );
                       },
                       // ----------------------------
-                      // Trailing: add/remove buttons
+                      // Trailing: add/remove buttons (hidden for vendors)
                       // ----------------------------
-                      trailing: outOfStock
-                          ? const Text(
-                              'Out of Stock',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          : quantity == 0
-                              ? IconButton(
-                                  icon: const Icon(Icons.add_shopping_cart),
-                                  onPressed: () {
-                                    cart.addItem(item);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('${item.name} added to cart!'),
-                                        duration: const Duration(seconds: 1),
-                                      ),
-                                    );
-                                  },
+                      trailing: (authService.isAuthenticated && authService.currentUser?.isVendor == true)
+                          ? null // Hide cart buttons for vendors
+                          : outOfStock
+                              ? const Text(
+                                  'Out of Stock',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 )
-                              : Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.remove),
+                              : quantity == 0
+                                  ? IconButton(
+                                      icon: const Icon(Icons.add_shopping_cart),
                                       onPressed: () {
-                                        cart.removeSingleItem(item);
+                                        cart.addItem(item);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('${item.name} added to cart!'),
+                                            duration: const Duration(seconds: 1),
+                                          ),
+                                        );
                                       },
+                                    )
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.remove),
+                                          onPressed: () {
+                                            cart.removeSingleItem(item);
+                                          },
+                                        ),
+                                        Text('$quantity'),
+                                        IconButton(
+                                          icon: const Icon(Icons.add),
+                                          onPressed: atMaxStock
+                                              ? null
+                                              : () {
+                                                  cart.addItem(item);
+                                                },
+                                        ),
+                                      ],
                                     ),
-                                    Text('$quantity'),
-                                    IconButton(
-                                      icon: const Icon(Icons.add),
-                                      onPressed: atMaxStock
-                                          ? null
-                                          : () {
-                                              cart.addItem(item);
-                                            },
-                                    ),
-                                  ],
-                                ),
                     ),
                   ),
                   // ----------------------------

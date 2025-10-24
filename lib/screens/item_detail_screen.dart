@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/api_item.dart';
 import '../models/api_cart.dart';
+import '../services/auth_service.dart';
 
 class ItemDetailScreen extends StatelessWidget {
   final ApiItem item;
@@ -11,10 +12,12 @@ class ItemDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = context.watch<AuthService>();
     final cart = context.watch<ApiCart>();
     final int quantity = cart.items[item] ?? 0;
     final bool outOfStock = item.stock == 0;
     final bool atMaxStock = quantity >= item.stock;
+    final bool isVendor = authService.isAuthenticated && authService.currentUser?.isVendor == true;
 
     return Scaffold(
       appBar: AppBar(title: Text(item.name)),
@@ -69,48 +72,49 @@ class ItemDetailScreen extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // ----------------------------
-                  // Cart controls
+                  // Cart controls (hidden for vendors)
                   // ----------------------------
-                  outOfStock
-                      ? const Text(
-                          'Out of Stock',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )
-                      : quantity == 0
-                          ? ElevatedButton.icon(
-                              icon: const Icon(Icons.add_shopping_cart),
-                              label: const Text('Add to Cart'),
-                              onPressed: () {
-                                cart.addItem(item);
-                              },
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.remove),
-                                  onPressed: () {
-                                    cart.removeSingleItem(item);
-                                  },
-                                ),
-                                Text(
-                                  '$quantity',
-                                  style: const TextStyle(fontSize: 18),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.add),
-                                  onPressed: atMaxStock
-                                      ? null // 👈 disable if at max stock
-                                      : () {
-                                          cart.addItem(item);
-                                        },
-                                ),
-                              ],
+                  if (!isVendor)
+                    outOfStock
+                        ? const Text(
+                            'Out of Stock',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
                             ),
+                          )
+                        : quantity == 0
+                            ? ElevatedButton.icon(
+                                icon: const Icon(Icons.add_shopping_cart),
+                                label: const Text('Add to Cart'),
+                                onPressed: () {
+                                  cart.addItem(item);
+                                },
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    onPressed: () {
+                                      cart.removeSingleItem(item);
+                                    },
+                                  ),
+                                  Text(
+                                    '$quantity',
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add),
+                                    onPressed: atMaxStock
+                                        ? null // 👈 disable if at max stock
+                                        : () {
+                                            cart.addItem(item);
+                                          },
+                                  ),
+                                ],
+                              ),
                 ],
               ),
             ),
