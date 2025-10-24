@@ -51,7 +51,11 @@ class _LoginScreenState extends State<LoginScreen> {
           role: _selectedRole,
         );
       }
-      // Navigation will be handled by main.dart listening to authService
+
+      // Navigate back to catalog screen after successful login/registration
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     } catch (e) {
       setState(() {
         _errorMessage = e.toString().replaceAll('ApiException: ', '');
