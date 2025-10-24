@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import '../models/api_item.dart';
 import '../services/api_service.dart';
+import '../services/orders_service.dart';
 
 /// API-backed vendor repository that communicates with the backend
 class ApiVendorRepository extends ChangeNotifier {
@@ -130,27 +131,29 @@ class ApiVendorRepository extends ChangeNotifier {
   /// Get all items (convenience method)
   List<ApiItem> getAllItems() => items;
 
-  /// Checkout - process cart and update stock
+  /// Checkout - process cart and create orders
   Future<void> checkout(Map<ApiItem, int> cartItems) async {
+    if (_token == null) {
+      throw Exception('Must be logged in to checkout');
+    }
+
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Convert cart items to a format the API expects
-      final orderItems = cartItems.entries.map((entry) {
-        return {
-          'itemId': entry.key.id,
-          'quantity': entry.value,
-        };
-      }).toList();
+      // Create an order for each item in the cart
+      for (final entry in cartItems.entries) {
+        final item = entry.key;
+        final quantity = entry.value;
 
-      final response = await ApiService.post(
-        '/api/items/checkout',
-        body: {'items': orderItems},
-      );
+        await OrdersService.createOrder(
+          token: _token!,
+          itemId: item.id,
+          quantity: quantity,
+        );
+      }
 
-      final data = ApiService.handleResponse(response);
-      print('✅ Checkout successful: ${data['message']}');
+      print('✅ Checkout successful - ${cartItems.length} orders created');
 
       // Refresh items to get updated stock
       await fetchItems();
