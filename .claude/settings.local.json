@@ -21,7 +21,10 @@
       "Bash(\"C:\\Users\\lukep\\AppData\\Local\\Android\\sdk\\cmdline-tools\\latest\\bin\\sdkmanager.bat\" \"platforms;android-36\")",
       "Bash(ipconfig:*)",
       "Bash(flutter clean:*)",
-      "Bash(flutter build:*)"
+      "Bash(flutter build:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(curl:*)",
+      "Bash(nslookup:*)"
     ],
     "deny": []
   }

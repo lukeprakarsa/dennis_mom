@@ -1,20 +1,10 @@
 import 'dart:convert';
-import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 
 /// Low-level API service for making HTTP requests to the backend
 class ApiService {
-  // Automatically detect platform and use appropriate base URL
-  // For Android physical device: http://192.168.50.88:3000 (your PC's IP)
-  // For Android emulator: http://10.0.2.2:3000
-  // For Windows/Web/iOS: http://localhost:3000
-  static String get baseUrl {
-    if (Platform.isAndroid) {
-      // Use your PC's local IP address for physical Android devices
-      return 'http://192.168.50.88:3000';
-    }
-    return 'http://localhost:3000';
-  }
+  // Production backend URL hosted on Render
+  static const String baseUrl = 'https://dennis-mom-backend.onrender.com';
 
   /// Make a GET request
   static Future<http.Response> get(
