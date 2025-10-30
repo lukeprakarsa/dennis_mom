@@ -58,9 +58,7 @@ class ItemDetailScreen extends StatelessWidget {
                   Text(item.description),
                   const SizedBox(height: 12),
 
-                  // ----------------------------
                   // Stock info
-                  // ----------------------------
                   Text(
                     'Stock: ${item.stock}',
                     style: TextStyle(
@@ -71,9 +69,7 @@ class ItemDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
 
-                  // ----------------------------
                   // Cart controls (hidden for vendors)
-                  // ----------------------------
                   if (!isVendor)
                     outOfStock
                         ? const Text(
@@ -108,7 +104,7 @@ class ItemDetailScreen extends StatelessWidget {
                                   IconButton(
                                     icon: const Icon(Icons.add),
                                     onPressed: atMaxStock
-                                        ? null // 👈 disable if at max stock
+                                        ? null
                                         : () {
                                             cart.addItem(item);
                                           },

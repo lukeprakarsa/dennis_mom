@@ -32,11 +32,8 @@ class _ApiCatalogScreenState extends State<ApiCatalogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('📱 Building ApiCatalogScreen...');
     return Scaffold(
-      // ----------------------------
-      // AppBar with cart icon + badge and login/user button
-      // ----------------------------
+      // AppBar with cart icon, badge, and login/user button
       appBar: AppBar(
         title: const Text('Catalog'),
         actions: [
@@ -158,19 +155,14 @@ class _ApiCatalogScreenState extends State<ApiCatalogScreen> {
         ],
       ),
 
-      // ----------------------------
       // Body: list of items
-      // ----------------------------
       body: Consumer3<AuthService, ApiCart, ApiVendorRepository>(
         builder: (context, authService, cart, repo, child) {
-          print('🛒 Consumer3 builder called - Cart items: ${cart.totalItemsCount}');
-
           if (repo.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
           final items = repo.getAllItems();
-          print('📦 Repository items: ${items.length}');
 
           if (items.isEmpty) {
             return const Center(
@@ -222,9 +214,7 @@ class _ApiCatalogScreenState extends State<ApiCatalogScreen> {
                         height: 50,
                       ),
                       title: Text(item.name),
-                      // ----------------------------
-                      // Subtitle: description + price + stock
-                      // ----------------------------
+                      // Subtitle: description, price, and stock
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -255,9 +245,7 @@ class _ApiCatalogScreenState extends State<ApiCatalogScreen> {
                           ),
                         );
                       },
-                      // ----------------------------
                       // Trailing: add/remove buttons (hidden for vendors)
-                      // ----------------------------
                       trailing: (authService.isAuthenticated && authService.currentUser?.isVendor == true)
                           ? null // Hide cart buttons for vendors
                           : outOfStock
@@ -303,9 +291,7 @@ class _ApiCatalogScreenState extends State<ApiCatalogScreen> {
                                     ),
                     ),
                   ),
-                  // ----------------------------
                   // Overlay for out-of-stock items (non-blocking)
-                  // ----------------------------
                   if (outOfStock)
                     Positioned.fill(
                       child: IgnorePointer(
@@ -330,9 +316,7 @@ class _ApiCatalogScreenState extends State<ApiCatalogScreen> {
         },
       ),
 
-      // ----------------------------
       // Floating Action Button: Vendor screen (vendors only)
-      // ----------------------------
       floatingActionButton: Consumer<AuthService>(
         builder: (context, authService, child) {
           // Only show vendor button if user is logged in as vendor

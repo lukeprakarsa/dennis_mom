@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'add_item_tab.dart';   // 👈 import the Add tab
-import 'edit_item_tab.dart';  // 👈 import the Edit tab
-import 'orders_tab.dart';     // 👈 import the Orders tab
+import 'add_item_tab.dart';
+import 'edit_item_tab.dart';
+import 'orders_tab.dart';
 
 class VendorScreen extends StatelessWidget {
   const VendorScreen({super.key});
@@ -10,7 +10,7 @@ class VendorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Add Items + Edit Items + Orders
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Vendor Dashboard'),
@@ -24,9 +24,9 @@ class VendorScreen extends StatelessWidget {
         ),
         body: const TabBarView(
           children: [
-            AddItemTab(),   // 👈 real widget now
-            EditItemTab(),  // 👈 real widget now
-            OrdersTab(),    // 👈 new Orders tab
+            AddItemTab(),
+            EditItemTab(),
+            OrdersTab(),
           ],
         ),
       ),

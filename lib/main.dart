@@ -10,26 +10,19 @@ import 'screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  print('🚀 App starting...');
 
   runApp(
     MultiProvider(
       providers: [
-        // ----------------------------
         // Authentication service
-        // ----------------------------
         ChangeNotifierProvider<AuthService>(
           create: (_) => AuthService()..initialize(),
         ),
 
-        // ----------------------------
         // Cart provider
-        // ----------------------------
         ChangeNotifierProvider<ApiCart>(create: (_) => ApiCart()),
 
-        // ----------------------------
         // Vendor repository provider (API-backed)
-        // ----------------------------
         ChangeNotifierProxyProvider<AuthService, ApiVendorRepository>(
           create: (_) => ApiVendorRepository(),
           update: (context, authService, repository) {
@@ -48,7 +41,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('🏗️ Building MyApp...');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Dennis Mom Catalog',

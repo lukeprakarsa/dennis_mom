@@ -19,9 +19,7 @@ class EditItemTab extends StatelessWidget {
           itemBuilder: (context, index) {
             final item = items[index];
             return ListTile(
-              // ----------------------------
               // Leading image with transparent fallback
-              // ----------------------------
               leading: ItemThumbnail(
                 imageUrl: item.imageUrl,
                 width: 50,
@@ -37,9 +35,7 @@ class EditItemTab extends StatelessWidget {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // ----------------------------
                   // Edit button
-                  // ----------------------------
                   IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: () {
@@ -52,9 +48,9 @@ class EditItemTab extends StatelessWidget {
                       final imageUrlController =
                           TextEditingController(text: item.imageUrl);
                       final stockController =
-                          TextEditingController(text: item.stock.toString()); // 👈 new controller
+                          TextEditingController(text: item.stock.toString());
 
-                      // 👇 Local state for preview inside the dialog
+                      // Local state for preview inside the dialog
                       String previewUrl = item.imageUrl;
 
                       final formKey = GlobalKey<FormState>();
@@ -213,9 +209,7 @@ class EditItemTab extends StatelessWidget {
                       );
                     },
                   ),
-                  // ----------------------------
                   // Delete button
-                  // ----------------------------
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () {

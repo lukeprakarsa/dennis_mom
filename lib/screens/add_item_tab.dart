@@ -17,28 +17,27 @@ class _AddItemTabState extends State<AddItemTab> {
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _imageUrlController = TextEditingController();
-  final _stockController = TextEditingController(); // 👈 new controller for stock
+  final _stockController = TextEditingController();
 
-  String? _previewUrl; // 👈 holds the current preview URL if valid
+  String? _previewUrl;
 
   void _clearForm() {
     _nameController.clear();
     _descriptionController.clear();
     _priceController.clear();
     _imageUrlController.clear();
-    _stockController.clear(); // 👈 reset stock field
-    setState(() => _previewUrl = null); // reset preview
+    _stockController.clear();
+    setState(() => _previewUrl = null);
   }
 
   @override
   void initState() {
     super.initState();
 
-    // 👇 Listen to changes in the image URL field
+    // Listen to changes in the image URL field
     _imageUrlController.addListener(() {
       final text = _imageUrlController.text.trim();
 
-      // Relaxed validation: just check http/https
       if (text.isNotEmpty &&
           (text.startsWith('http://') || text.startsWith('https://'))) {
         setState(() => _previewUrl = text);
@@ -58,9 +57,7 @@ class _AddItemTabState extends State<AddItemTab> {
         key: _formKey,
         child: ListView(
           children: [
-            // ----------------------------
             // Name field
-            // ----------------------------
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Item Name'),
@@ -68,17 +65,13 @@ class _AddItemTabState extends State<AddItemTab> {
                   value == null || value.isEmpty ? 'Enter a name' : null,
             ),
 
-            // ----------------------------
             // Description field
-            // ----------------------------
             TextFormField(
               controller: _descriptionController,
               decoration: const InputDecoration(labelText: 'Description'),
             ),
 
-            // ----------------------------
             // Price field (with validation)
-            // ----------------------------
             TextFormField(
               controller: _priceController,
               decoration: const InputDecoration(labelText: 'Price'),
@@ -94,14 +87,11 @@ class _AddItemTabState extends State<AddItemTab> {
                 if (parsed < 0) {
                   return 'Price cannot be negative';
                 }
-                // 👇 Zero is allowed (giveaways), positive numbers are fine too
                 return null;
               },
             ),
 
-            // ----------------------------
             // Stock field (with validation)
-            // ----------------------------
             TextFormField(
               controller: _stockController,
               decoration: const InputDecoration(labelText: 'Stock Quantity'),
@@ -118,17 +108,13 @@ class _AddItemTabState extends State<AddItemTab> {
               },
             ),
 
-            // ----------------------------
             // Image URL field
-            // ----------------------------
             TextFormField(
               controller: _imageUrlController,
               decoration: const InputDecoration(labelText: 'Image URL'),
             ),
 
-            // ----------------------------
-            // Live image preview (or placeholder)
-            // ----------------------------
+            // Live image preview
             const SizedBox(height: 12),
             Text('Preview:', style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 8),
@@ -156,9 +142,7 @@ class _AddItemTabState extends State<AddItemTab> {
 
             const SizedBox(height: 20),
 
-            // ----------------------------
             // Submit button
-            // ----------------------------
             ElevatedButton(
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {

@@ -30,10 +30,8 @@ class AuthService extends ChangeNotifier {
 
         _token = savedToken;
         _currentUser = AppUser.fromJson(data['user']);
-        print('✅ Restored user session: ${_currentUser?.email}');
       }
     } catch (e) {
-      print('⚠️ Failed to restore session: $e');
       await _clearSession();
     } finally {
       _isLoading = false;
@@ -66,10 +64,7 @@ class AuthService extends ChangeNotifier {
       _currentUser = AppUser.fromJson(data['user']);
 
       await _saveSession();
-
-      print('✅ User registered: ${_currentUser?.email}');
     } catch (e) {
-      print('❌ Registration failed: $e');
       rethrow;
     } finally {
       _isLoading = false;
@@ -100,10 +95,7 @@ class AuthService extends ChangeNotifier {
       _currentUser = AppUser.fromJson(data['user']);
 
       await _saveSession();
-
-      print('✅ User logged in: ${_currentUser?.email}');
     } catch (e) {
-      print('❌ Login failed: $e');
       rethrow;
     } finally {
       _isLoading = false;
@@ -117,7 +109,6 @@ class AuthService extends ChangeNotifier {
     _currentUser = null;
     _token = null;
     notifyListeners();
-    print('✅ User logged out');
   }
 
   /// Save session to local storage

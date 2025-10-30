@@ -29,10 +29,7 @@ class ApiVendorRepository extends ChangeNotifier {
       // Parse response body as JSON list
       final List<dynamic> itemsList = jsonDecode(response.body);
       _items = itemsList.map((json) => ApiItem.fromJson(json as Map<String, dynamic>)).toList();
-
-      print('✅ Fetched ${_items.length} items from API');
     } catch (e) {
-      print('❌ Error fetching items: $e');
       _items = [];
       rethrow;
     } finally {
@@ -61,9 +58,7 @@ class ApiVendorRepository extends ChangeNotifier {
       final newItem = ApiItem.fromJson(data['item']);
 
       _items.add(newItem);
-      print('✅ Added item: ${newItem.name}');
     } catch (e) {
-      print('❌ Error adding item: $e');
       rethrow;
     } finally {
       _isLoading = false;
@@ -94,10 +89,7 @@ class ApiVendorRepository extends ChangeNotifier {
       if (index != -1) {
         _items[index] = item;
       }
-
-      print('✅ Updated item: ${item.name}');
     } catch (e) {
-      print('❌ Error updating item: $e');
       rethrow;
     } finally {
       _isLoading = false;
@@ -118,9 +110,7 @@ class ApiVendorRepository extends ChangeNotifier {
       await ApiService.delete('/api/items/$id', token: _token);
 
       _items.removeWhere((item) => item.id == id);
-      print('✅ Deleted item: $id');
     } catch (e) {
-      print('❌ Error deleting item: $e');
       rethrow;
     } finally {
       _isLoading = false;
@@ -153,12 +143,9 @@ class ApiVendorRepository extends ChangeNotifier {
         );
       }
 
-      print('✅ Checkout successful - ${cartItems.length} orders created');
-
       // Refresh items to get updated stock
       await fetchItems();
     } catch (e) {
-      print('❌ Error during checkout: $e');
       rethrow;
     } finally {
       _isLoading = false;
